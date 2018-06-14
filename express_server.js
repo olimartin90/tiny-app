@@ -28,16 +28,16 @@ const urlDatabase = {
 
 // USERS DATABASE - KEYS (ID, EMAIL, PASSWORD) : VALUES "xyzIdEmailPassword"
 const users = {
-  "userRandomID": {
-    id: "userRandomID",
-    email: "user@example.com",
-    password: "purple-monkey-dinosaur"
-  },
- "user2RandomID": {
-    id: "user2RandomID",
-    email: "user2@example.com",
-    password: "dishwasher-funk"
-  }
+    "userRandomID": {
+        id: "userRandomID",
+        email: "user@example.com",
+        password: "purple-monkey-dinosaur"
+    },
+    "user2RandomID": {
+        id: "user2RandomID",
+        email: "user2@example.com",
+        password: "dishwasher-funk"
+    }
 };
 
 // GET REGISTRATION PAGE FROM SERVER TO BROWSER
@@ -47,20 +47,43 @@ app.get("/register", (req, res) => {
 
 //  POST REGISTRATION INFORMATIONS FROM BROWSER TO SERVER
 app.post("/register", (req, res) => {
-    let id = generateRandomString();
-    users[id] = {
-        id: id,
-        email: req.body.email,
-        password: req.body.password
-    };
-    console.log(users);
-    res.cookie("id", id);
+    EmailRegistration(req, res);
     res.redirect("/urls");
 });
 
+// FUNCTION TO VERIFY AND THEN REGISTER EMAIL
+function EmailRegistration(req, res) {
+    let id = generateRandomString();
+    let emailEntry = req.body.email;
+    let passwordEntry = req.body.password;
+    if (!emailEntry || !passwordEntry) {
+        res.send(400);
+    }
+    if (emailEntry.length) {
+        var emailExist = false;
+        for (var userKey in users) {
+            console.log(users[userKey].email);
+            if (emailEntry === users[userKey].email) {
+                emailExist = true;
+            }
+        }
+        if (emailExist) {
+            res.send(400);
+        } else {
+            users[id] = {
+                id: id,
+                email: req.body.email,
+                password: req.body.password
+            }
+            res.cookie("id", id);
+            console.log(users);
+        }
+    }
+};
+
 // POST THE USERNAME WITH COOKIES for LOGGING IN
 app.post("/login", (req, res) => {
-    res.cookie("username", req.body.username)
+    res.cookie("user_id", req.body.id)
     res.redirect("/urls");
 });
 
@@ -89,7 +112,7 @@ app.get("/hello", (req, res) => {
 app.get("/urls", (req, res) => {
     let templateVars = {
         urls: urlDatabase,
-        username: req.cookies["username"]
+        id: req.cookies["user_id"]
     };
     res.render("urls_index", templateVars);
 });
@@ -97,7 +120,7 @@ app.get("/urls", (req, res) => {
 // URLS NEW ENTRY PAGE FOR USER
 app.get("/urls/new", (req, res) => {
     let templateVars = {
-        username: req.cookies["username"]
+        id: req.cookies["users_id"]
     };
     res.render("urls_new", templateVars);
 });
@@ -117,7 +140,7 @@ app.get("/urls/:id", (req, res) => {
     let templateVars = {
         shortURL: shortURL,
         longURL: longURL,
-        username: req.cookies["username"]
+        id: req.cookies["user_id"]
     };
     res.render("urls_show", templateVars);
 });
@@ -151,5 +174,4 @@ app.post("/urls/:id/delete", (req, res) => {
 app.listen(PORT, () => {
     console.log(`Example app listening on port ${PORT}!`);
 });
-
 
