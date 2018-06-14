@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>TinyApp</title>
+</head>
+<body>
+  <header>
+    <% include partials/_header %>
+  </header>
+  <table>
+  <thead>
+    <tr>
+      <th>Short URL</th>
+      <th>Long URL</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% for ( let shortUrl in urls ) { %>
+    <tr>
+      <td><%= shortUrl %></td>
+      <td><a href="<%= urls[shortUrl] %>"><%= urls[shortUrl] %></a></td>
+      <td>
+        <form method="GET" action="/urls/<%= shortUrl %>">
+          <input type="submit" value="Edit" />
+        </form>
+      </td>
+      <td>
+        <form method="POST" action="/urls/<%= shortUrl %>/delete">
+          <input type="submit" value="Delete" />
+        </form>
+      </td>
+    </tr>
+  <% } %>
+  </tbody>
+</table>
+<a href="/urls/new">Shortening a new url</a>
+</body>
+</html>
+
