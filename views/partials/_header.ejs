@@ -1,14 +1,7 @@
 <title>Shortening URL</title>
-<% if(id){ %>
+<% if(user) { %>
+  <p>Welcome! <%=user.email%></p>
   <form action="/logout" method="POST" style="margin: 10px;">
-    <label for="username">Username:</label>
-    <input id="username" type="text" name="username" value="<%= id %>" style="width: 227px">
-    <input id="username" type="submit" value="Logout">
+    <input type="submit" value="Logout">
   </form>
- <% } else{ %>
-  <form action="/login" method="POST" style="margin: 10px;">
-    <label for="username">Username:</label>
-    <input id="username" type="text" name="username" value="<%= id %>" style="width: 227px">
-    <input id="username" type="submit" value="Login">
-  </form>
-<% } %>
+ <% } %>
