@@ -83,7 +83,8 @@ function EmailRegistration(req, res) {
                 email: req.body.email,
                 password: bcrypt.hashSync(req.body.password, 10)
             }
-            res.cookie("user_id", id);
+            // res.cookie("user_id", id);
+            req.session.user_id = users[id];
         }
     }
 };
@@ -126,7 +127,8 @@ app.post("/login", (req, res) => {
     let userAuthenticated = false;
     for (let userId in users) {
         if (emailLogin === users[userId].email && bcrypt.compareSync(passwordLogin, users[userId].password)) {
-            res.cookie("user_id", userId);
+            // res.cookie("user_id", userId);
+            req.session.user_id = users[userId];
             userAuthenticated = true;
         }
     }
@@ -140,26 +142,36 @@ app.post("/login", (req, res) => {
 
 // CLEAR THE COOKIES WHEN LOGGING OUT
 app.post("/logout", (req, res) => {
-    res.clearCookie("user_id")
-    res.redirect("/login");
+    // res.clearCookie("user_id")
+    req.session.user_id;
+    req.session = null;
+    res.redirect("/urls");
 });
 
 
 // PAGE WITH THE FILTERED URLS WHEN USER LOGGED IN
 app.get("/urls", (req, res) => {
-    let templateVars = {
-        urls: filterUrls(req.cookies["user_id"]),
-        user: users[req.cookies["user_id"]]
-    };
-    res.render("urls_index", templateVars);
+    if (!req.session.user_id) {
+        let templateVars = {
+            urls: "",
+            user: ""
+        };
+        res.render("urls_index", templateVars);
+    } else {
+        let templateVars = {
+            urls: filterUrls(req.session.user_id.id),
+            user: req.session.user_id
+        };
+        res.render("urls_index", templateVars);
+    }
 });
 
 
 // URLS NEW ENTRY PAGE FOR USER
 app.get("/urls/new", (req, res) => {
-    if (req.cookies.user_id && users[req.cookies.user_id]) {
+    if (req.session.user_id || users[req.session.user_id]) {
         let templateVars = {
-            user: users[req.cookies["user_id"]]
+            user: req.session.user_id
         }
     res.render("urls_new", templateVars);
     } else {
@@ -174,7 +186,7 @@ app.post("/urls", (req, res) => {
     let longURL = req.body.longURL;
     urlDatabase[shortURL] = {
         longURL: longURL,
-        userId: req.cookies.user_id
+        userId: req.session.user_id.id
     };
     res.redirect("/urls");
 });
@@ -188,7 +200,8 @@ app.get("/urls/:id", (req, res) => {
     let templateVars = {
         shortURL: shortURL,
         longURL: longURL,
-        user: users[req.cookies["user_id"]]
+        // user: req.session.user_id
+        user: users[req.session.user_id]
     };
     res.render("urls_show", templateVars);
 });
@@ -197,13 +210,11 @@ app.get("/urls/:id", (req, res) => {
 app.post("/urls/:id", (req, res) => {
     let shortURL = req.params.id
     let longURL = req.body.longURL;
-    console.log("cookie", req.cookies.user_id);
-    console.log("urlDatabase[shortURL].userId", urlDatabase[shortURL].userId)
-    if (req.cookies.user_id === urlDatabase[shortURL].userId) {
+    if (req.session.user_id.id === urlDatabase[shortURL].userId) {
         urlDatabase[shortURL] = {
         shortURL: shortURL,
         longURL: longURL,
-        userId: req.cookies.user_id
+        userId: req.session.user_id.id
         }
     res.redirect("/urls");
     } else {
