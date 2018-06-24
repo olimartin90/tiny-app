@@ -1,16 +1,18 @@
-const express       = require("express");
-const app           = express();
-const PORT          = 8080; // default port 8080
+const express = require("express");
+const app = express();
+const PORT = 8080;
 const cookieSession = require("cookie-session");
-const bodyParser    = require("body-parser");
-const bcrypt        = require("bcrypt");
+const bodyParser = require("body-parser");
+const bcrypt = require("bcrypt");
 
-app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.urlencoded({
+    extended: true
+}));
 
 app.use(cookieSession({
-  name: "session",
-  keys: ["Hello folks, I like motocross"],
-  maxAge: 24 * 60 * 60 * 1000
+    name: "session",
+    keys: ["Hello folks, I like motocross"],
+    maxAge: 24 * 60 * 60 * 1000
 }));
 
 app.set("view engine", "ejs");
@@ -27,7 +29,6 @@ const urlDatabase = {
         userId: "user2RandomID"
     }
 };
-
 
 // USERS DATABASE - KEYS (ID, EMAIL, PASSWORD) : VALUES "xyzIdEmailPassword"
 const users = {
@@ -58,39 +59,35 @@ function generateRandomString() {
     return text;
 };
 
-
 // FUNCTION TO VERIFY AND THEN REGISTER EMAIL
 function EmailRegistration(req, res) {
     let id = generateRandomString();
     let emailEntry = req.body.email;
     let passwordEntry = req.body.password;
     if (!emailEntry || !passwordEntry) {
-        res.send(400);
+        res.send(400, "Email and/or Password missing");
     }
     if (emailEntry.length) {
         let emailExist = false;
         for (let userKey in users) {
-            // console.log(users[userKey].email);
             if (emailEntry === users[userKey].email) {
                 emailExist = true;
             }
         }
         if (emailExist) {
-            res.send(400);
+            res.send(400, "Email already registered");
         } else {
             users[id] = {
-                id: id,
-                email: req.body.email,
-                password: bcrypt.hashSync(req.body.password, 10)
-            }
-            // res.cookie("user_id", id);
+                    id: id,
+                    email: req.body.email,
+                    password: bcrypt.hashSync(req.body.password, 10)
+                }
             req.session.user_id = users[id];
         }
     }
 };
 
-
-// FUNCTION TO FILTER URLS ACCORDING THE USER ID
+// FUNCTION TO FILTER URLS BY THE USER ID
 function filterUrls(userId) {
     const urlDatabaseFiltered = {};
     for (const shortURL in urlDatabase) {
@@ -107,7 +104,7 @@ app.get("/register", (req, res) => {
     res.render("urls_register");
 });
 
-//  POST REGISTRATION INFORMATIONS FROM BROWSER TO SERVER
+//  POST REGISTRATION INFORMATIONS FROM BROWSER TO SERVER & USING FUNCTION EMAILREGISTRATION
 app.post("/register", (req, res) => {
     EmailRegistration(req, res);
     res.redirect("/urls");
@@ -119,7 +116,6 @@ app.get("/login", (req, res) => {
     res.render("urls_login")
 });
 
-
 // POST THE EMAIL WITH COOKIES FOR LOGGING IN
 app.post("/login", (req, res) => {
     let emailLogin = req.body.email;
@@ -127,29 +123,26 @@ app.post("/login", (req, res) => {
     let userAuthenticated = false;
     for (let userId in users) {
         if (emailLogin === users[userId].email && bcrypt.compareSync(passwordLogin, users[userId].password)) {
-            // res.cookie("user_id", userId);
             req.session.user_id = users[userId];
             userAuthenticated = true;
         }
     }
     if (!userAuthenticated) {
-        res.send(403);
+        res.send(403, "User not authenticated");
     } else {
         res.redirect("/urls");
     }
 });
 
-
 // CLEAR THE COOKIES WHEN LOGGING OUT
 app.post("/logout", (req, res) => {
-    // res.clearCookie("user_id")
     req.session.user_id;
     req.session = null;
     res.redirect("/urls");
 });
 
 
-// PAGE WITH THE FILTERED URLS WHEN USER LOGGED IN
+// PAGE WITH THE FILTERED URLS WHEN USER LOGGED IN - USING THE FUNCTION FILTERURLS
 app.get("/urls", (req, res) => {
     if (!req.session.user_id) {
         let templateVars = {
@@ -166,20 +159,6 @@ app.get("/urls", (req, res) => {
     }
 });
 
-
-// URLS NEW ENTRY PAGE FOR USER
-app.get("/urls/new", (req, res) => {
-    if (req.session.user_id || users[req.session.user_id]) {
-        let templateVars = {
-            user: req.session.user_id
-        }
-    res.render("urls_new", templateVars);
-    } else {
-        res.redirect("/login");
-    }
-});
-
-
 // POST THE NEW GENERATED SHORT URL - LONG URL IN THE DATABASE (UPDATE THE DB)
 app.post("/urls", (req, res) => {
     let shortURL = generateRandomString();
@@ -192,6 +171,18 @@ app.post("/urls", (req, res) => {
 });
 
 
+// URLS NEW ENTRY PAGE FOR USER
+app.get("/urls/new", (req, res) => {
+    if (req.session.user_id || users[req.session.user_id]) {
+        let templateVars = {
+            user: req.session.user_id
+        }
+        res.render("urls_new", templateVars);
+    } else {
+        res.redirect("/login");
+    }
+});
+
 
 // PAGE SHOWING THE SINGLE URL AND LONG URL
 app.get("/urls/:id", (req, res) => {
@@ -200,9 +191,8 @@ app.get("/urls/:id", (req, res) => {
     let templateVars = {
         shortURL: shortURL,
         longURL: longURL,
-        // user: req.session.user_id
-        user: users[req.session.user_id]
-    };
+        user: req.session.user_id
+    }
     res.render("urls_show", templateVars);
 });
 
@@ -212,11 +202,11 @@ app.post("/urls/:id", (req, res) => {
     let longURL = req.body.longURL;
     if (req.session.user_id.id === urlDatabase[shortURL].userId) {
         urlDatabase[shortURL] = {
-        shortURL: shortURL,
-        longURL: longURL,
-        userId: req.session.user_id.id
+            shortURL: shortURL,
+            longURL: longURL,
+            userId: req.session.user_id.id
         }
-    res.redirect("/urls");
+        res.redirect("/urls");
     } else {
         res.send(403, "Cannot Update");
     }
@@ -232,7 +222,7 @@ app.get("/u/:shortURL", (req, res) => {
         redirectURL = 'http://' + longURL;
     } else {
         redirectURL = longURL;
-    };
+    }
     res.redirect(redirectURL);
 });
 
@@ -250,10 +240,12 @@ app.get("/", (req, res) => {
     res.end("Good Bye!");
 });
 
+
 // DATABASE WITH JSON
 app.get("/urls.json", (req, res) => {
     res.json(urlDatabase);
 });
+
 
 // HELLO WORLD PAGE
 app.get("/hello", (req, res) => {

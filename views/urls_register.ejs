@@ -4,22 +4,22 @@
   <title>TinyApp</title>
 </head>
 <body>
-<h3>Registration</h3>
   <table>
   <tbody>
     <tr>
       <td>
-        <form action="/register" method="POST">
+        <h3>Registration</h3>
+        <form action="/register" method="POST" style="margin: 20px;">
           <label for="email">Email:</label>
-          <input type="email" name="email" value="" />
+          <input type="email" name="email" value="" style="margin: 10px; width: 250px">
         <div>
           <label for="password">Password:</label>
-          <input type="password" name="password" value="" />
+          <input type="password" name="password" value="" style="margin: 10px; width: 227px">
         </div>
           <input type="submit" value="Register" />
         </form>
-      <h4>Login</h4>
-        <form action="/login" method="GET" style="margin: 10px;">
+        <h4>Login</h4>
+        <form action="/login" method="GET" style="margin: 15px;">
           <input type="submit" value="Login">
         </form>
       </td>

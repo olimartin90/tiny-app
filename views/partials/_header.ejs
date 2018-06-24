@@ -1,14 +1,14 @@
 <title>Shortening URL</title>
 <% if(user) { %>
   <p>Welcome! <%=user.email%></p>
-  <form action="/logout" method="POST" style="margin: 10px;">
+  <form action="/logout" method="POST" style="margin: 15px;">
     <input type="submit" value="Logout">
   </form>
  <% } else {%>
-   <form action="/register" method="GET" style="margin: 10px;">
+   <form action="/register" method="GET" style="margin: 15px;">
     <input type="submit" value="Register">
   </form>
-  <form action="/login" method="GET" style="margin: 10px;">
+  <form action="/login" method="GET" style="margin: 15px;">
     <input type="submit" value="Login">
   </form>
   <% } %>
