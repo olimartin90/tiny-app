@@ -4,6 +4,7 @@
   "description": "Web Project 1",
   "main": "express_server.js",
   "dependencies": {
+    "bcrypt": "^2.0.1",
     "bcryptjs": "^2.4.3",
     "body-parser": "^1.18.3",
     "connect-flash": "^0.1.1",

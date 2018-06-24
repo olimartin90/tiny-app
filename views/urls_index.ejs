@@ -18,7 +18,7 @@
     <% for ( let shortUrl in urls ) { %>
     <tr>
       <td><%= shortUrl %></td>
-      <td><a href="<%= urls[shortUrl] %>"><%= urls[shortUrl].longURL %></a></td>
+          <td><a href="<%= urls[shortUrl].longURL %>"><%= urls[shortUrl].longURL %></a></td>
       <td>
         <form method="GET" action="/urls/<%= shortUrl %>">
           <input type="submit" value="Edit" />

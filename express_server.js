@@ -1,15 +1,19 @@
 const express       = require("express");
 const app           = express();
 const PORT          = 8080; // default port 8080
-const cookieParser  = require('cookie-parser');
+const cookieSession = require("cookie-session");
 const bodyParser    = require("body-parser");
+const bcrypt        = require("bcrypt");
 
-app.use(bodyParser.urlencoded({
-    extended: true
+app.use(bodyParser.urlencoded({ extended: true }));
+
+app.use(cookieSession({
+  name: "session",
+  keys: ["Hello folks, I like motocross"],
+  maxAge: 24 * 60 * 60 * 1000
 }));
 
 app.set("view engine", "ejs");
-app.use(cookieParser());
 
 
 // URL DATABASE - KEY = SHORT URL : VALUE = LONG URL
@@ -30,17 +34,17 @@ const users = {
     "userRandomID": {
         id: "userRandomID",
         email: "user@example.com",
-        password: "1234"
+        password: bcrypt.hashSync("1234", 10)
     },
     "user2RandomID": {
         id: "user2RandomID",
         email: "user2@example.com",
-        password: "4321"
+        password: bcrypt.hashSync("4321", 10)
     },
     "123userRandomAbcID": {
         id: "123userRandomAbcId",
         email: "olifear@hotmail.com",
-        password: "1q2w3e"
+        password: bcrypt.hashSync("1q2w3e", 10)
     }
 };
 
@@ -77,12 +81,13 @@ function EmailRegistration(req, res) {
             users[id] = {
                 id: id,
                 email: req.body.email,
-                password: req.body.password
+                password: bcrypt.hashSync(req.body.password, 10)
             }
             res.cookie("user_id", id);
         }
     }
 };
+
 
 // FUNCTION TO FILTER URLS ACCORDING THE USER ID
 function filterUrls(userId) {
@@ -120,7 +125,7 @@ app.post("/login", (req, res) => {
     let passwordLogin = req.body.password;
     let userAuthenticated = false;
     for (let userId in users) {
-        if (emailLogin === users[userId].email && passwordLogin === users[userId].password) {
+        if (emailLogin === users[userId].email && bcrypt.compareSync(passwordLogin, users[userId].password)) {
             res.cookie("user_id", userId);
             userAuthenticated = true;
         }
@@ -207,28 +212,19 @@ app.post("/urls/:id", (req, res) => {
 });
 
 
-// const urlDatabase = {
-//     "b2xVn2": {
-//         longURL: "http://www.lighthouselabs.ca",
-//         userId: "userRandomID"
-//     },
-//     "9sm5xK": {
-//         longURL: "http://www.google.com",
-//         userId: "user2RandomID"
-//     }
-// };
-
-
-
-// PAGE TO THE LONG URL
+// PAGE TO THE LONG URL FROM THE SHORT URL
 app.get("/u/:shortURL", (req, res) => {
-    const longURL = urlDatabase[req.params.shortURL];
-    if (longURL === undefined) {
-        res.status(404).send("Not Found");
+    let shortURL = req.params.id;
+    let longURL = urlDatabase[req.params.shortURL].longURL;
+    let redirectURL;
+    if (!longURL.includes('http')) {
+        redirectURL = 'http://' + longURL;
     } else {
-        res.redirect(301, longURL);
-    }
+        redirectURL = longURL;
+    };
+    res.redirect(redirectURL);
 });
+
 
 // DELETE URL
 app.post("/urls/:id/delete", (req, res) => {
