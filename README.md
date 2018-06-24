@@ -24,4 +24,10 @@ The app is built on HTML, EJS using Express, Cookie Session and Bcrypt.
 
 ## Screenshots
 
-!["Screenshot of about to tweet - textbox"]()
+!["Screenshot of the main page - urls"](https://github.com/olimartin90/tiny-app/blob/master/docs/Screenshot%202018-06-24%2017.42.27.png?raw=true)
+!["Screenshot of the main page - urls when logged in"](https://github.com/olimartin90/tiny-app/blob/master/docs/Screenshot%202018-06-24%2017.42.48.png?raw=true)
+!["Screenshot of the add a new url when logged in"](https://github.com/olimartin90/tiny-app/blob/master/docs/Screenshot%202018-06-24%2017.43.04.png?raw=true)
+!["Screenshot of the main page with urls added when logged in"](https://github.com/olimartin90/tiny-app/blob/master/docs/Screenshot%202018-06-24%2017.43.17.png?raw=true)
+!["Screenshot of the short url to be updated when logged in"](https://github.com/olimartin90/tiny-app/blob/master/docs/Screenshot%202018-06-24%2017.43.44.png?raw=true)
+!["Screenshot of the error message - user not authenticated"](https://github.com/olimartin90/tiny-app/blob/master/docs/Screenshot%202018-06-24%2017.44.06.png?raw=true)
+!["Screenshot of the error message - email/password missing"](https://github.com/olimartin90/tiny-app/blob/master/docs/Screenshot%202018-06-24%2017.44.15.png?raw=true)
