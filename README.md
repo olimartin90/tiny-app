@@ -8,7 +8,7 @@ The app is built on HTML, EJS using Express, Cookie Session and Bcrypt.
 ## Getting Started
 
 1. Install dependencies using the `npm install` command.
-3. Start the web server using the `npm run local` command. The app will be served at <http://localhost:8080/> or using the `node --inspect express_server.js`
+3. Start the web server using the `npm run local` command. The app will be served at <http://localhost:8080/>.
 4. Go to <http://localhost:8080/> in your browser.
 
 ## Dependencies
